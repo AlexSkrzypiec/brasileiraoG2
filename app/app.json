@@ -9,7 +9,7 @@
     {
       "name": "network",
       "desc": "Buscar o placar ao vivo do Brasileirão no seu servidor.",
-      "whitelist": ["https://SEU-PROXY.exemplo.com"]
+      "whitelist": [https://brasileirao-g2-proxy.onrender.com]
     }
   ],
   "supported_languages": ["pt-BR"]
