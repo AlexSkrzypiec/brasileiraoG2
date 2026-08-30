@@ -8,7 +8,7 @@ import {
 
 // Troque pela URL do seu proxy depois do deploy (ver server/index.js).
 // Precisa constar em app.json → permissions → network → whitelist.
-const PROXY_URL = 'https://SEU-PROXY.exemplo.com/jogos-ao-vivo'
+const PROXY_URL = https://brasileirao-g2-proxy.onrender.com/jogos-ao-vivo
 const REFRESH_MS = 30_000
 const CYCLE_MS = 8_000 // troca de jogo automaticamente se houver mais de um
 
