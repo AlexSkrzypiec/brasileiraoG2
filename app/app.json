@@ -1,16 +1,16 @@
 {
   "package_id": "com.seunome.brasileiraoaovivo",
   "name": "Brasileirão Ao Vivo",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "edition": "202601",
-  "min_sdk_version": "0.0.12",
+  "min_sdk_version": "0.0.14",
   "entrypoint": "index.html",
   "permissions": [
     {
       "name": "network",
       "desc": "Buscar o placar ao vivo do Brasileirão no seu servidor.",
-      "whitelist": [https://brasileirao-g2-proxy.onrender.com]
+      "whitelist": ["https://brasileirao-g2-proxy.onrender.com"]
     }
   ],
-  "supported_languages": ["pt-BR"]
+  "supported_languages": ["en"]
 }
