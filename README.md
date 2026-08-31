@@ -50,9 +50,9 @@ Com a URL pública em mãos (de qualquer uma das opções acima):
 
 1. Em `app/src/main.ts`, troque:
    ```ts
-   const PROXY_URL = 'https://SEU-PROXY.exemplo.com/jogos-ao-vivo'
+   const PROXY_URL = 'https://SEU-PROXY.exemplo.com/contexto'
    ```
-   pela sua URL real + `/jogos-ao-vivo`.
+   pela sua URL real + `/contexto`.
 
 2. Em `app/app.json`, troque o mesmo domínio (sem o path) dentro de:
    ```json
@@ -98,6 +98,37 @@ dados é a URL pública que você configurou na Parte 2.
 
 ---
 
+## Configuração do proxy
+
+Variáveis de ambiente (só `API_FUTEBOL_KEY` é obrigatória):
+
+| Variável | Padrão | Para quê |
+| --- | --- | --- |
+| `API_FUTEBOL_KEY` | — | Sua chave da API Futebol. |
+| `CAMPEONATO_ID` | `10` | Brasileirão Série A. |
+| `TIME_ID` | — | Liga a tela "meu time". Pegue o `time.time_id` em `/v1/campeonatos/10/tabela`. |
+| `LIMITE_DIARIO` | `0` | Teto de requisições/dia à API Futebol. `0` desliga a trava. Veja seu limite em `/v1/me`. |
+| `MAX_DETALHES` | `3` | Quantas partidas ao vivo buscamos em detalhe por ciclo (cada uma custa 1 requisição). |
+| `TTL_AO_VIVO` | `25000` | Cache do placar durante o jogo. |
+| `TTL_AO_VIVO_OCIOSO` | `300000` | Cache quando não há jogo — a maior economia do dia. |
+| `TTL_TABELA` | `1800000` | Cache da classificação. |
+| `TTL_ARTILHARIA` | `21600000` | Cache da artilharia. |
+| `TTL_TIME` | `21600000` | Cache de próximo/último jogo. |
+
+Rotas:
+
+- `GET /contexto` — tudo que as telas do G2 precisam, em uma resposta só.
+  Inclui `proximaConsultaMs`, que o app obedece: com jogo rolando ele volta em
+  ~30s, sem jogo ele espaça para 5 min.
+- `GET /jogos-ao-vivo` — formato antigo, mantido por compatibilidade.
+- `GET /plano` — espelha o `/v1/me` da API Futebol (plano, limite, consumo)
+  mais o contador local do proxy. Use para calibrar os TTLs acima.
+
+Cuidado com a chave: se ela começa com `test_`, você está no ambiente de
+testes. Todos os endpoints respondem, sem limite, mas com dados fictícios.
+
+---
+
 ## Como funciona
 
 - O óculos chama só o seu proxy (`/jogos-ao-vivo`), nunca a API Futebol
@@ -105,7 +136,13 @@ dados é a URL pública que você configurou na Parte 2.
   para chamadas de navegador/WebView.
 - O proxy busca `/ao-vivo` na API Futebol a cada requisição, filtra pelo
   Brasileirão Série A e devolve um JSON já resumido.
-- O app no G2 atualiza o placar a cada 30s e troca de jogo automaticamente
-  a cada 8s (ou no toque, se houver mais de uma partida ao vivo).
+- O proxy busca `/ao-vivo`, e para cada partida em andamento busca também
+  `/partidas/{id}` — o `/ao-vivo` é só um resumo e não traz eventos, então o
+  "último lance" depende dessa segunda chamada.
+- Ele também monta classificação, artilharia e o próximo/último jogo do seu
+  time, tudo com cache separado por tipo de dado.
+- O app no G2 tem quatro telas: placar, classificação, artilharia e meu time.
+  Toque simples troca de tela; na tela de placar, os jogos ao vivo giram
+  sozinhos a cada 8s.
 - Duplo toque mostra a confirmação de saída do sistema — obrigatório pela
   QA do Even Hub em apps de página raiz.
